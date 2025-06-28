@@ -1,21 +1,39 @@
-from logging.handlers import RotatingFileHandler
+import logging
+import os
 
-handler = RotatingFileHandler(
-    "masks.log", maxBytes=1_000_000, backupCount=3, encoding="utf-8"
+print("=== Инициализация логеров ===")  # Добавьте эту строку
+
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    level=logging.DEBUG,
+    handlers=[
+        logging.FileHandler("logs/debug.log"),
+        logging.StreamHandler()
+    ]
 )
+logger = logging.getLogger(__name__)
+logger.info("Тестовое сообщение")
 
-def setup_logger(name: str, log_file: str) -> logging.Logger:
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+# Создаем папку logs при импорте
+os.makedirs("logs", exist_ok=True)
 
-    handler = logging.FileHandler(log_file, encoding="utf-8")
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S"
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    return logger
+# Логер для utils
+utils_logger = logging.getLogger("utils")
+utils_logger.setLevel(logging.DEBUG)
 
-# Использование:
-logger = setup_logger(__name__, "utils.log")
+# Настройка файлового обработчика
+utils_handler = logging.FileHandler("logs/utils.log")
+utils_formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+utils_handler.setFormatter(utils_formatter)
+utils_logger.addHandler(utils_handler)
+
+# Логер для masks
+masks_logger = logging.getLogger("masks")
+masks_logger.setLevel(logging.DEBUG)
+masks_handler = logging.FileHandler("logs/masks.log")
+masks_handler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+))
+masks_logger.addHandler(masks_handler)
