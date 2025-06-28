@@ -10,6 +10,27 @@ from src.masks import mask_card, mask_account
 class TestMaskCard:
     """Тесты для функции mask_card"""
 
+    def mask_card(card_number: str) -> str:
+        try:
+            if not isinstance(card_number, str):  # Проверяем тип
+                raise TypeError("Номер карты должен быть строкой")
+
+            logger.debug(f"Маскирование карты: {card_number}")
+            masked = card_number[:4] + " **** **** " + card_number[-4:]
+            logger.info(f"Замаскировано: {masked}")
+            return masked
+        except Exception as e:
+            logger.error(f"Ошибка маскирования: {e}", exc_info=True)
+            return "Ошибка"
+
+    def mask_card(card_number: str) -> str:
+        if not isinstance(card_number, str):
+            logger.error("Номер карты должен быть строкой")
+            raise ValueError("Требуется строка")
+        if len(card_number) != 16:
+            logger.warning("Номер карты нестандартной длины")
+        ...
+
     def test_valid_card(self):
         """Проверка маскировки валидного номера карты"""
         assert mask_card("1234567812345678") == "1234 56** **** 5678"

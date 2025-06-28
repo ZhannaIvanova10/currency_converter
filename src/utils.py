@@ -1,25 +1,30 @@
-"""Utilities module for file operations."""
-
-import json
 import logging
-from pathlib import Path
-from typing import List, Dict, Union
 
-
+# Настройка логгера
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)  # Уровень DEBUG или выше
 
+# Создаём FileHandler (пишет логи в файл)
+file_handler = logging.FileHandler("utils.log", mode="a")  # 'a' - дозапись
+file_handler.setLevel(logging.DEBUG)
 
-def read_json_file(file_path: Union[str, Path]) -> List[Dict]:
-    """Чтение JSON файла с транзакциями."""
+# Форматирование логов
+formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+file_handler.setFormatter(formatter)
+
+# Добавляем обработчик к логгеру
+logger.addHandler(file_handler)
+
+# Пример функции с логированием
+def add_numbers(a, b):
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            logger.info("Успешно прочитан файл: %s", file_path)
-            return data
+        logger.debug(f"Сложение чисел: {a} + {b}")
+        result = a + b
+        logger.info(f"Результат: {result}")
+        return result
     except Exception as e:
-        logger.error(
-            "Ошибка чтения файла %s: %s",
-            file_path,
-            str(e),
-            exc_info=True)
-        raise
+        logger.error(f"Ошибка: {e}", exc_info=True)
+        return None
