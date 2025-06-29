@@ -1,39 +1,37 @@
 import logging
 import os
+import sys
+from logging.handlers import RotatingFileHandler
 
-print("=== Инициализация логеров ===")  # Добавьте эту строку
+
+class UTF8RotatingFileHandler(RotatingFileHandler):
+    """Кастомный обработчик с гарантией UTF-8"""
+
+    def __init__(self, filename, **kwargs):
+        kwargs.setdefault('encoding', 'utf-8')
+        super().__init__(filename, **kwargs)
+
+
+def setup_logger(name, log_file, level=logging.DEBUG):
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+
+    handler = UTF8RotatingFileHandler(
+        log_file,
+        maxBytes=1_000_000,
+        backupCount=3
+    )
+
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    handler.setFormatter(formatter)
+
+    logger.addHandler(handler)
+    return logger
+
 
 os.makedirs("logs", exist_ok=True)
-logging.basicConfig(
-    level=logging.DEBUG,
-    handlers=[
-        logging.FileHandler("logs/debug.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
-logger.info("Тестовое сообщение")
-
-# Создаем папку logs при импорте
-os.makedirs("logs", exist_ok=True)
-
-# Логер для utils
-utils_logger = logging.getLogger("utils")
-utils_logger.setLevel(logging.DEBUG)
-
-# Настройка файлового обработчика
-utils_handler = logging.FileHandler("logs/utils.log")
-utils_formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-utils_handler.setFormatter(utils_formatter)
-utils_logger.addHandler(utils_handler)
-
-# Логер для masks
-masks_logger = logging.getLogger("masks")
-masks_logger.setLevel(logging.DEBUG)
-masks_handler = logging.FileHandler("logs/masks.log")
-masks_handler.setFormatter(logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-))
-masks_logger.addHandler(masks_handler)
+utils_logger = setup_logger("utils", "logs/utils.log")
+masks_logger = setup_logger("masks", "logs/masks.log")
