@@ -1,30 +1,26 @@
 import logging
+import os
 
-# Настройка логгера
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # Уровень DEBUG или выше
 
-# Создаём FileHandler (пишет логи в файл)
-file_handler = logging.FileHandler("utils.log", mode="a")  # 'a' - дозапись
-file_handler.setLevel(logging.DEBUG)
+# Настройка логера
+os.makedirs("logs", exist_ok=True)
+utils_logger = logging.getLogger("utils")
+utils_logger.setLevel(logging.DEBUG)  # Уровень не ниже DEBUG
 
-# Форматирование логов
-formatter = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
-)
-file_handler.setFormatter(formatter)
+# File handler
+handler = logging.FileHandler("logs/utils.log", mode="w")
+handler.setFormatter(logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+))
+utils_logger.addHandler(handler)
 
-# Добавляем обработчик к логгеру
-logger.addHandler(file_handler)
 
-# Пример функции с логированием
 def add_numbers(a, b):
+    utils_logger.debug(f"Вызов add_numbers с аргументами: {a}, {b}")
     try:
-        logger.debug(f"Сложение чисел: {a} + {b}")
         result = a + b
-        logger.info(f"Результат: {result}")
+        utils_logger.info(f"Успешный результат: {result}")
         return result
     except Exception as e:
-        logger.error(f"Ошибка: {e}", exc_info=True)
-        return None
+        utils_logger.error(f"Ошибка в add_numbers: {e}", exc_info=True)
+        raise
