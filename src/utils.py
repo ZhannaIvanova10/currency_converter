@@ -1,11 +1,26 @@
-import json
-from typing import List, Dict, Any
+import logging
+import os
 
-def read_json_file(file_path: str) -> List[Dict[str, Any]]:
-    """Читает JSON-файл и возвращает список словарей."""
+
+# Настройка логера
+os.makedirs("logs", exist_ok=True)
+utils_logger = logging.getLogger("utils")
+utils_logger.setLevel(logging.DEBUG)  # Уровень не ниже DEBUG
+
+# File handler
+handler = logging.FileHandler("logs/utils.log", mode="w")
+handler.setFormatter(logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+))
+utils_logger.addHandler(handler)
+
+
+def add_numbers(a, b):
+    utils_logger.debug(f"Вызов add_numbers с аргументами: {a}, {b}")
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            data = json.load(file)
-            return data if isinstance(data, list) else []
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+        result = a + b
+        utils_logger.info(f"Успешный результат: {result}")
+        return result
+    except Exception as e:
+        utils_logger.error(f"Ошибка в add_numbers: {e}", exc_info=True)
+        raise
